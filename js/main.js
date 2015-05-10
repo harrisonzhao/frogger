@@ -20,8 +20,8 @@ var game = (function () {
     renderer.setSize(width, height);
     renderer.setClearColor(0xE0EEEE);
     //enable shadows, turn off for now
-    //renderer.shadowMapEnabled = true;
-    //renderer.shadowMapType = THREE.PCFShadowMap;
+    // renderer.shadowMapEnabled = true;
+    // renderer.shadowMapType = THREE.PCFShadowMap;
 
 
     document.getElementById("webgl-container").appendChild(renderer.domElement);
@@ -36,7 +36,7 @@ var game = (function () {
     scene.add(camera);
 
     // scene.fog = new THREE.Fog(0xE0EEEE, 250, 600);
-    scene.setGravity(new THREE.Vector3(0, -100, 0));
+    //scene.setGravity(new THREE.Vector3(0, -100, 0));
 
     function init() {
 
@@ -44,6 +44,7 @@ var game = (function () {
         player.createPlayer();
         //pointerLock.init(camera, scene);
         sceneSetup.addSceneObjects();
+        gameControls.init();
         //enemy.init();
         //player.createPlayer();
         //gameControls.init();
@@ -55,8 +56,8 @@ var game = (function () {
         //-45, 15, 0 degs
         camera.rotation.set(support.toRad(-60), support.toRad(15), support.toRad(15));
         camera.position.set(75, 150, 75);
-        // camera.rotation.set(0, support.toRad(45), support.toRad(15));
-        // camera.position.set(100, 20, 100);
+        //camera.rotation.set(0, support.toRad(90), support.toRad(15));
+        //camera.position.set(0, 20, 100);
     }
 
     // function removeLife() {

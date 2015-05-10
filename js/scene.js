@@ -1,117 +1,82 @@
 'use strict';
-/*global THREE, game*/
+/*global THREE, Physijs, game, models*/
 
 var sceneSetup = (function () {
 
   var treeTexture= THREE.ImageUtils.loadTexture('content/tree.jpg'); //http://opengameart.org/node/8149
 
-  function createRoad(zPos) {
-    var roadDepth = 10;
-    var roadWidth = 400; //20 spaces
-    var roadHeight = 1;
-    var roadBorderDepth = 1;
-
-    var road = new THREE.Mesh(
-      //width 200, height 1, depth 12
-      new THREE.BoxGeometry(roadWidth, roadHeight, roadDepth),
-      //new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('content/road.jpg') }), //http://opengameart.org/sites/default/files/oga-textures/tunnel_road.jpg
-      new THREE.MeshLambertMaterial({
-        color: 0x525866 //grey
-      })
-    );
-
-    road.name = 'road';
-    road.receiveShadow = true;
-    road.position.y = 1;
-    road.position.z = zPos;
-    game.scene.add(road);
-
-    var roadBorder = new THREE.Mesh(
-      new THREE.BoxGeometry(roadWidth, roadHeight, roadBorderDepth),
-      new THREE.MeshLambertMaterial({
-        color: 0x7b8396
-      })
-    );
-    roadBorder.name = 'roadBorder';
-    roadBorder.receiveShadow = true;
-    roadBorder.position.y = 1;
-    roadBorder.position.z = zPos-roadDepth/2+roadBorderDepth/2;
-    game.scene.add(roadBorder);
-
+  function createRoad(zPos, nRows) {
+    for (var i = 0; i < nRows; ++i) {
+      var road = models.createRoad(zPos);
+      game.scene.add(road);
+      zPos -= -10;
+    }
   }
 
-  function createRiver(zPos) {
+  function createRiver(zPos, nRows) {
+    for (var i = 0; i < nRows; ++i) {
+      var river = models.createRiver(zPos);
+      game.scene.add(river);
+      zPos -= 10;
+    }
+  }
 
-    //2 size buffer on both sides
-    var river = new THREE.Mesh(
-      new THREE.BoxGeometry(400, 1, 10),
-      //new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('content/water.jpg') }), //http://opengameart.org/node/10510
-      new THREE.MeshLambertMaterial({
-        color: 0x80f5ff
-      }),
-      0
-    );
-
-    river.name = "lake";
-    river.position.y = 1;
-    river.position.z = zPos;
-    game.scene.add(river);
+  function createGrass(zPos, nRows) {
+    for (var i = 0; i < nRows; ++i) {
+      var grass = models.createGrass(zPos);
+      game.scene.add(grass);
+      zPos -= 10;
+    }
   }
 
   function createTree(x, z) {
-
-    //lets have some variety with our trees
-    var treeBaseWidth = support.getRand(15, 22);
-
-    var tree = new THREE.Mesh(
-      new THREE.CylinderGeometry(1, treeBaseWidth, 60, 9, 9, false),
-      new THREE.MeshLambertMaterial({ ambient: 0x003311 * support.getRand(0, 5), map: treeTexture }),
-      0
-      );
-
-    var stump = new THREE.Mesh(
-      new THREE.CylinderGeometry(5, 5, 20, 9, 9, false),
-      new THREE.MeshLambertMaterial({ ambient: 0x552211  }),
-      0
-      );
-
-    tree.add(stump);
-
-    stump.position.y = -40;
-
-    tree.name = "tree";
-    tree.position.set(x, 40, z);
-
+    var tree = models.createTree(x, z);
     game.scene.add(tree);
   }
 
 
   function addSceneObjects() {
-    var ground = new Physijs.BoxMesh(
-      new THREE.BoxGeometry(2000, 1, 2000),
-      new THREE.MeshLambertMaterial({ color: 0xbef566 }),
-      0
-    );
+    //       var grassTexture = THREE.ImageUtils.loadTexture('../content/grass.png'); //http://opengameart.org/sites/default/files/grass_0_0.png
+    //     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+    //     grassTexture.repeat.set(25, 25);
 
-    ground.name = "ground";
-    ground.castShadow = false;
-    ground.receiveShadow = true;
-    ground.position.y = 0;
-    game.scene.add(ground);
+    //     var material = Physijs.createMaterial(
+    //         new THREE.MeshLambertMaterial({ map: grassTexture }),
+    //         0.9,
+    //         0.1
+    //     );
+    // var ground = new Physijs.BoxMesh(
+    //   new THREE.BoxGeometry(2000, 1, 2000),
+    //   material, //new THREE.MeshLambertMaterial({ color: 0xbef566 }),
+    //   0
+    // );
+
+    // ground.name = "ground";
+    // ground.castShadow = false;
+    // ground.receiveShadow = true;
+    // ground.position.y = 0;
+    // game.scene.add(ground);
+    
+    createGrass(35, 3);
 
     //first road
-    createRoad(5);
+    createRoad(5, 1);
 
     //trees
     // for (var i = 0; i < 20; i++) {
     //   createTree(support.getRand(-500, 500), support.getRand(-250, -320));
     // }
+    
+    createTree(10, -15);
 
     //second road
-    createRoad(-15);
+    createRoad(-15, 1);
 
     //lake
-    createRiver(-5);
+    createRiver(-5, 1);
+
+    var car = models.createCar(1, 'right', 100, 10, -5);
+    game.scene.add(car);
 
     setupSceneLighting();
   }
@@ -122,12 +87,11 @@ var sceneSetup = (function () {
     game.scene.add(ambientLight);
 
     var spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.position.set(0, 250, -50);
+    spotLight.position.set(-100, 250, -50);
     spotLight.castShadow = true;
     spotLight.shadowDarkness = 0.5;
     spotLight.shadowCameraVisible = true; // only for debugging
     game.scene.add(spotLight);
-
   }
 
   return {
