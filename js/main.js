@@ -74,6 +74,9 @@ var game = (function () {
     vehicle.update(delta);
     log.update(delta);
     player.update(delta);
+    if (vehicle.checkCollision() === true) {
+      console.log('you died');
+    }
     // enemy.update(delta);
 
     // if (game.wintext) {

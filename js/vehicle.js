@@ -1,5 +1,5 @@
 'use strict';
-/*globals globals, support, models, game*/
+/*globals globals, support, models, game, player*/
 
 var vehicle = (function() {
   var vehicles = {}; //map row # to array of vehicles in that row
@@ -36,6 +36,7 @@ var vehicle = (function() {
     for (var i = 0; i < vehicles[rowId].length; ++i) {
       game.scene.remove(vehicles[rowId][i]);
     }
+    delete vehicles[rowId];
   }
 
   function updateRow(rowId, delta) {
@@ -65,11 +66,51 @@ var vehicle = (function() {
     }
   }
 
+  function checkCollision() {
+    var playerBox = player.playerBox();
+    var xPos = playerBox.position.x;
+    var zPos = playerBox.position.z;
+    var pdx = playerBox.data.width/2;
+    var pdz = playerBox.data.depth/2;
+    var rowIds = [Math.round(zPos/globals.blockSize)];
+    var possibleRowId = Math.round((zPos + pdz)/globals.blockSize);
+    if (possibleRowId !== rowIds[0]) {
+      rowIds.push(possibleRowId);
+    } else {
+      possibleRowId = Math.round((zPos - pdz)/globals.blockSize);
+      if (possibleRowId !== rowIds[0]) {
+        rowIds.push(possibleRowId);
+      }
+    }
+    for (var i = 0; i < rowIds.length; ++i) {
+      if (!(rowIds[i] in vehicles)) {
+        continue;
+      }
+      var rowId = rowIds[i];
+      for (var j = 0; j < vehicles[rowId].length; ++j) {
+        var vehicle = vehicles[rowId][j];
+        var vdx = vehicle.data.width/2;
+        var vdz = vehicle.data.depth/2;
+        if (vehicle.position.x - vdx <= xPos + pdx && 
+            vehicle.position.x + vdx >= xPos + pdx) {
+          return true;
+        }
+
+        if (vehicle.position.x + vdx >= xPos - pdx &&
+            vehicle.position.x - vdx <= xPos - pdx) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   return {
     addRow: addRow,
     getRow: getRow,
     deleteRow: deleteRow,
-    update: update
+    update: update,
+    checkCollision: checkCollision
   };
 
 })();
