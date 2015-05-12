@@ -2,11 +2,10 @@
 'use strict';
 
 var game = (function () {
-
   var scene = new THREE.Scene();
   var camera;
   var clock = new THREE.Clock();
-  var width = window.innerWidth;
+  var width = window.innerWidth - 10;
   var height = window.innerHeight - 10;
   var playerBox;
   var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -76,7 +75,6 @@ var game = (function () {
 
     // if (game.wintext) {
     //     game.wintext.rotation.y += 0.01;
-    // }
 
     renderer.render(scene, camera);
     requestAnimationFrame(render);
@@ -96,4 +94,4 @@ var game = (function () {
 
 })();
 
-  window.onload = game.init();
+window.onload = game.init();

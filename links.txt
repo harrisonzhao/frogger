@@ -3,3 +3,6 @@ http://stackoverflow.com/questions/15478093/realistic-lighting-sunlight-with-thr
 
 bouncing:
 http://www.kadrmasconcepts.com/blog/2012/05/29/greensock-three-js/
+
+use less than greater than for collision detection
+iterate over all cars see if less that greater than
