@@ -9,6 +9,7 @@ var support = (function () {
   function getRandInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
   }
+  
   function toRad(deg) {
     return deg * Math.PI / 180;
   }

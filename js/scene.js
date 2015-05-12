@@ -3,7 +3,7 @@
 
 var sceneSetup = (function () {
 
-  var treeTexture= THREE.ImageUtils.loadTexture('content/tree.jpg'); //http://opengameart.org/node/8149
+  //var treeTexture= THREE.ImageUtils.loadTexture('content/tree.jpg'); //http://opengameart.org/node/8149
 
   function createRoad(zPos) {
     var road = models.createRoad(zPos);
@@ -23,11 +23,7 @@ var sceneSetup = (function () {
   function createGrass(zPos) {
     var grass = models.createGrass(zPos);
     game.scene.add(grass);
-    for (var i = -20; i < 20; ++i) {
-      if (i < -6 || i >= 6 || Math.random() > 0.95) {
-        createTree(i*10, zPos);
-      }
-    }
+    tree.addRow(zPos/10, 0.1);
   }
 
   function addSceneObjects() {
@@ -48,6 +44,7 @@ var sceneSetup = (function () {
     vehicle.addRow(-2);
     createRoad(-20);
 
+    log.addRow(-3);
     createRiver(-30);
 
     setupSceneLighting();
@@ -59,11 +56,19 @@ var sceneSetup = (function () {
     game.scene.add(ambientLight);
 
     var spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.position.set(0, 250, -50);
+    spotLight.position.set(-50, 250, -50);
     spotLight.castShadow = true;
     spotLight.shadowDarkness = 0.5;
     spotLight.shadowCameraVisible = true; // only for debugging
     game.scene.add(spotLight);
+
+    // var directionalLight = new THREE.DirectionalLight( 0x404040, 0.5 );
+    // directionalLight.position.set( 50, 50, -50 );
+    // directionalLight.target.position.set( 0, 0, 0 );
+    // directionalLight.shadowCameraVisible = true;
+    // directionalLight.castShadow = true;
+    // directionalLight.shadowCameraVisible = true;
+    // game.scene.add(directionalLight);
 
   }
 

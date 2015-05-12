@@ -17,8 +17,8 @@ var game = (function () {
   renderer.setClearColor(0xE0EEEE);
   
   // enable shadows, turn off for now
-  // renderer.shadowMapEnabled = true;
-  // renderer.shadowMapType = THREE.PCFShadowMap;
+  renderer.shadowMapEnabled = true;
+  renderer.shadowMapType = THREE.PCFShadowMap;
 
 
   document.getElementById("webgl-container").appendChild(renderer.domElement);
@@ -45,7 +45,7 @@ var game = (function () {
     //enemy.init();
     //player.createPlayer();
     //gameControls.init();
-
+    
     render();
   }
 
@@ -71,6 +71,9 @@ var game = (function () {
     // pointerLock.controls.update();
 
     var delta = clock.getDelta();
+    vehicle.update(delta);
+    log.update(delta);
+    player.update(delta);
     // enemy.update(delta);
 
     // if (game.wintext) {

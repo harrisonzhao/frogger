@@ -212,6 +212,9 @@ var models = (function() {
     car.position.y = 5.5;
     car.position.x = startPos;
     car.position.z = zPos;
+    if (car.data.origin === 'left') {
+      car.rotation.y = support.toRad(180);
+    }
     return car;
   }
 
