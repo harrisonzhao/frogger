@@ -31,7 +31,6 @@ var vehicle = (function() {
 
   function deleteRow(rowId) {
     if (!(rowId in vehicles)) {
-      console.log('error! rowId:', rowId, 'should be in vehicles.');
       return;
     }
     for (var i = 0; i < vehicles[rowId].length; ++i) {

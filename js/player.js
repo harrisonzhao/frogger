@@ -1,5 +1,5 @@
 'use strict';
-/*global THREE, Physijs, game, models, support, tree*/
+/*global THREE, Physijs, game, models, support, tree, globals*/
 
 var player = (function() {
 
@@ -54,7 +54,6 @@ var player = (function() {
   }
 
   function moveZ(step) {
-    if (tree.checkValidPosition)
     if (animating) {
       return;
     }

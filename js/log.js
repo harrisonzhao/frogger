@@ -31,12 +31,12 @@ var log = (function() {
 
   function deleteRow(rowId) {
     if (!(rowId in logs)) {
-      console.log('error! rowId:', rowId, 'should be in logs.');
       return;
     }
     for (var i = 0; i < logs[rowId].length; ++i) {
       game.scene.remove(logs[rowId][i]);
     }
+    delete logs[rowId];
   }
 
   function updateRow(rowId, delta) {

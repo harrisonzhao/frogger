@@ -91,7 +91,7 @@ var game = (function () {
     controls: controls,
     playerActive: playerActive,
     resetScene: resetScene,
-    lives: lives,
+    lives: lives
     // removeLife: removeLife
   }
 

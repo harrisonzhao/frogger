@@ -44,6 +44,16 @@ var tree = (function() {
     return true;
   }
 
+  function deleteRow(rowId) {
+    if (!(rowId in trees)) {
+      return;
+    }
+    for (var i = 0; i < trees[rowId].length; ++i) {
+      game.scene.remove(trees[rowId][i]);
+    }
+    delete trees[rowId];
+  }
+
   return {
     addRow: addRow,
     checkValidPosition: checkValidPosition
