@@ -12,6 +12,7 @@ var game = (function () {
   var playerActive = true;
   var lives = 3;
   var controls;
+  var light;
 
   renderer.setSize(width, height);
   renderer.setClearColor(0xE0EEEE);
@@ -29,8 +30,19 @@ var game = (function () {
     1,
     1000
   );
-
   scene.add(camera);
+
+  var spotLight = new THREE.SpotLight(0xffffff);
+  spotLight.position.set(-50, 250, -50);
+  spotLight.castShadow = true;
+  spotLight.shadowDarkness = 0.5;
+  spotLight.target.position.z = 0;
+  // spotLight.shadowCameraNear = 500;
+  // spotLight.shadowCameraFar = 4000;
+  // spotLight.shadowCameraFov = 30;
+  spotLight.shadowCameraVisible = true; // only for debugging
+  light = spotLight;
+  scene.add(light);
 
   // scene.fog = new THREE.Fog(0xE0EEEE, 250, 600);
   //scene.setGravity(new THREE.Vector3(0, -100, 0));
@@ -77,6 +89,7 @@ var game = (function () {
     if (vehicle.checkCollision() === true) {
       console.log('you died');
     }
+    sceneSetup.generateMoreRows();
     // enemy.update(delta);
 
     // if (game.wintext) {
@@ -94,7 +107,8 @@ var game = (function () {
     controls: controls,
     playerActive: playerActive,
     resetScene: resetScene,
-    lives: lives
+    lives: lives,
+    light: light
     // removeLife: removeLife
   }
 

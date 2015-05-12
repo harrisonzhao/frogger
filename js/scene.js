@@ -1,5 +1,5 @@
 'use strict';
-/*global THREE, models, game, globals, vehicle, log, tree, support*/
+/*global THREE, models, game, globals, vehicle, log, tree, support, player*/
 
 var sceneSetup = (function () {
 
@@ -8,13 +8,44 @@ var sceneSetup = (function () {
   var currentRowId = 0; //current generated row id
   var highestRowId;
 
+  function increaseRows() {
+    --currentRowId;
+    ++currentNumRows;
+    if (currentNumRows % 20 === 0) {
+      // var offset = (currentNumRows-8)*globals.blockSize;
+      // var directionalLight = new THREE.DirectionalLight( 0x404040, 0.5 );
+      // directionalLight.position.set( -50, 150, -50-offset);
+      // directionalLight.target.position.set( 25, 0, 0-offset);
+      // directionalLight.shadowCameraVisible = true;
+      // directionalLight.shadowCameraLeft = -100; // or whatever value works for the scale of your scene
+      // directionalLight.shadowCameraRight = 100;
+      // directionalLight.shadowCameraTop = 100-offset;
+      // directionalLight.shadowCameraBottom = -100-offset;
+      // directionalLight.castShadow = true;
+      // directionalLight.shadowCameraVisible = true;
+      // game.scene.add(directionalLight);
+    }
+  }
+
+  function generateMoreRows() {
+    var playerBox = player.playerBox();
+    var rowId = Math.round(playerBox.position.z/10);
+    if (-rowId + 20 >= currentNumRows) {
+      createRandomRows();
+    }
+    while (highestRowId >= rowId+20) {
+      deleteRow(highestRowId);
+      --highestRowId;
+      --currentNumRows;
+    }
+  }
+
   function createRoad(rowId) {
     var road = models.createRoad(rowId*globals.blockSize);
     vehicle.addRow(rowId);
     game.scene.add(road);
     rows[rowId] = road;
-    --currentRowId;
-    ++currentNumRows;
+    increaseRows();
   }
 
   function createRiver(rowId) {
@@ -22,8 +53,7 @@ var sceneSetup = (function () {
     log.addRow(rowId);
     game.scene.add(river);
     rows[rowId] = river;
-    --currentRowId;
-    ++currentNumRows;
+    increaseRows();
   }
 
   function createGrass(rowId, probTree) {
@@ -31,8 +61,7 @@ var sceneSetup = (function () {
     game.scene.add(grass);
     tree.addRow(rowId, probTree);
     rows[rowId] = grass;
-    --currentRowId;
-    ++currentNumRows;
+    increaseRows();
   }
 
   function deleteRow(rowId) {
@@ -55,7 +84,6 @@ var sceneSetup = (function () {
     }
     var i;
     for (i = 0; i < nRows; ++i) {
-      console.log(type);
       switch (type) {
       case 0:
         createGrass(currentRowId, 0.1);
@@ -64,7 +92,7 @@ var sceneSetup = (function () {
         createRoad(currentRowId);
         break;
       case 2:
-        createRoad(currentRowId);
+        createRoad(currentRowId); //river not supported yet
         break;
       }
     }
@@ -74,6 +102,7 @@ var sceneSetup = (function () {
         createGrass(currentRowId);
       }
     }
+
   }
 
   function addSceneObjects() {
@@ -105,12 +134,12 @@ var sceneSetup = (function () {
     var ambientLight = new THREE.AmbientLight(0xcccccc);
     game.scene.add(ambientLight);
 
-    var spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.position.set(-50, 250, -50);
+    // var spotLight = new THREE.SpotLight(0xffffff);
+    // spotLight.position.set(-50, 250, -50);
     // spotLight.castShadow = true;
     // spotLight.shadowDarkness = 0.5;
     // spotLight.shadowCameraVisible = true; // only for debugging
-    game.scene.add(spotLight);
+    // game.scene.add(spotLight);
 
     // var directionalLight = new THREE.DirectionalLight( 0x404040, 0.5 );
     // directionalLight.position.set( -25, 150, -50);
@@ -129,7 +158,8 @@ var sceneSetup = (function () {
   return {
     addSceneObjects: addSceneObjects,
     createRoad: createRoad,
-    createRiver: createRiver
+    createRiver: createRiver,
+    generateMoreRows: generateMoreRows
   }
 
 })();

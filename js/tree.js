@@ -3,6 +3,7 @@
 var tree = (function() {
 
   var trees = {}; //map of zPos to array of trees in that row
+  var sideTrees = {};
 
   function createTree(xPos, zPos) {
     var tree = models.createTree(xPos, zPos);
@@ -12,13 +13,16 @@ var tree = (function() {
 
   function addRow(rowId, prob) {
     trees[rowId] = [];
+    sideTrees[rowId] = [];
+    var tree;
     var zPos = rowId * globals.blockSize;
     for (var i = globals.minCol; i < globals.maxCol; ++i) {
       var xPos = i*globals.blockSize;
       if (i < globals.lowerCol || i > globals.upperCol) {
-        createTree(xPos, zPos);
+        tree = createTree(xPos, zPos);
+        sideTrees[rowId].push(tree);
       } else if (Math.random() < prob) {
-        var tree = createTree(xPos, zPos);
+        tree = createTree(xPos, zPos);
         tree.data = {
           colId: i,
           rowId: rowId
@@ -48,15 +52,21 @@ var tree = (function() {
     if (!(rowId in trees)) {
       return;
     }
-    for (var i = 0; i < trees[rowId].length; ++i) {
+    var i;
+    for (i = 0; i < trees[rowId].length; ++i) {
       game.scene.remove(trees[rowId][i]);
     }
+    for (i = 0; i < sideTrees[rowId].length; ++i) {
+      game.scene.remove(sideTrees[rowId][i]);
+    }
     delete trees[rowId];
+    delete sideTrees[rowId];
   }
 
   return {
     addRow: addRow,
-    checkValidPosition: checkValidPosition
+    checkValidPosition: checkValidPosition,
+    deleteRow: deleteRow
   };
 
 })();

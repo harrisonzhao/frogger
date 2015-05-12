@@ -62,6 +62,7 @@ var models = (function() {
       width: 8,
       depth: 8
     }
+
     return playerBox;
   }
 

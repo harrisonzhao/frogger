@@ -33,6 +33,14 @@ var player = (function() {
     playerBox.position.y = getY(progress);
     playerBox.position.z += step;
     game.camera.position.z += step;
+
+    game.light.position.z = playerBox.position.z - 50;
+    //game.light.position.y = game.light.position.z * -5;
+    //game.light.position.x = game.light.position.z;
+    game.light.target = playerBox;
+    game.light.updateMatrix();
+    game.light.updateMatrixWorld();
+    console.log(game.light.target.position);
   }
 
   function saveOriginalState() {
