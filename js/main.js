@@ -31,17 +31,25 @@ var game = (function () {
     1000
   );
   scene.add(camera);
-
+  var pointLight = new THREE.PointLight( 0x404040, 0.1);
+  scene.add(pointLight);
   var spotLight = new THREE.SpotLight(0xffffff);
   spotLight.position.set(-50, 250, -50);
-  spotLight.castShadow = true;
-  spotLight.shadowDarkness = 0.5;
-  spotLight.target.position.z = 0;
-  // spotLight.shadowCameraNear = 500;
-  // spotLight.shadowCameraFar = 4000;
-  // spotLight.shadowCameraFov = 30;
-  spotLight.shadowCameraVisible = true; // only for debugging
-  light = spotLight;
+  spotLight.intensity = 0.25;
+  // spotLight.castShadow = true;
+  // spotLight.shadowDarkness = 0.5;
+  // spotLight.shadowCameraVisible = true; // only for debugging
+  var directionalLight = new THREE.DirectionalLight( 0x404040, 0.5 );
+  directionalLight.position.set( -50, 150, -50);
+  directionalLight.shadowCameraVisible = true;
+  directionalLight.shadowCameraLeft = -145; // or whatever value works for the scale of your scene
+  directionalLight.shadowCameraRight = 145;
+  directionalLight.shadowCameraTop = 145;
+  directionalLight.shadowCameraBottom = -145;
+  directionalLight.castShadow = true;
+  directionalLight.shadowCameraVisible = true;
+  light = directionalLight;
+  light.add(spotLight);
   scene.add(light);
 
   // scene.fog = new THREE.Fog(0xE0EEEE, 250, 600);

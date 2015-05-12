@@ -40,7 +40,6 @@ var player = (function() {
     game.light.target = playerBox;
     game.light.updateMatrix();
     game.light.updateMatrixWorld();
-    console.log(game.light.target.position);
   }
 
   function saveOriginalState() {
