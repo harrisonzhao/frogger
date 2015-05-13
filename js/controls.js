@@ -53,6 +53,7 @@ var gameControls = (function() {
     document.getElementById('message').innerHTML = 'You died!';
     document.getElementById('score').innerHTML = 'Score: ' + rowId;
     document.getElementById('click').innerHTML = 'Click to reload';
+    document.getElementById('rowNumDiv').style.display = 'none';
   }
 
   function init() {
@@ -60,7 +61,9 @@ var gameControls = (function() {
       var blocker = document.getElementById('blocker');
       blocker.style.display = 'none';
       if (respawn) {
-        location.reload();
+        if (!game.playerActive()) {
+          location.reload();
+        }
       } else {
         respawn = true;
       }

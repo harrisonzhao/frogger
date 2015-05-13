@@ -11,15 +11,21 @@ var vehicle = (function() {
   }
 
   function addRow(rowId) {
-    var speed = support.getRandInt(1, 4);
-    var width = 4 - speed;
+    //faster w/ more rows
+    var speed = support.getRandInt(1, 4) + (-rowId/(-rowId+50))*2;
+    var width = support.getRandInt(1, 4);
+    if (width === 4) {
+      width = 3.5;
+    }
     var origin = support.getRandInt(0, 2) === 0 ? 'left' : 'right';
     var zPos = rowId * globals.blockSize;
     vehicles[rowId] = [];
+    var lower = 6 - width;
+    var upper = 10 - width;
     var maxX = globals.maxX - (width * globals.blockSize);
     for (var i = globals.minX;
          i < maxX;
-         i += (support.getRand(4, 6) * width * globals.blockSize)) {
+         i += (support.getRand(lower, upper) * width * globals.blockSize)) {
       var vehicle = createVehicle(width, origin, i, speed, zPos);
       vehicles[rowId].push(vehicle);
     }

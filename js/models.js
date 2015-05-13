@@ -1,5 +1,5 @@
 'use strict';
-/*globals THREE, game, support*/
+/*globals THREE, game, support, globals*/
 
 var models = (function() {
 
@@ -20,11 +20,24 @@ var models = (function() {
       color: 0x00dd00
     });
 
+    var whiteMaterial = new THREE.MeshPhongMaterial({
+      color: 0xffffff
+    });
+    var blackMaterial = new THREE.MeshPhongMaterial({
+      color: 0x000000
+    });
     var playerBody = new THREE.Mesh(
       new THREE.BoxGeometry(8, 4, 8),
       personMaterial
     );
 
+    var mouth = new THREE.Mesh(
+      new THREE.BoxGeometry(6, 1, 0.1),
+      blackMaterial
+    );
+    mouth.position.z = -4;
+    mouth.position.y = -1;
+    playerBody.add(mouth);
     playerBody.position.y = -4;
     playerBody.receiveShadow = true;
     playerBody.castShadow = true;
@@ -36,6 +49,19 @@ var models = (function() {
         new THREE.BoxGeometry(3, 4, 2),
         personMaterial
       );
+      var white = new THREE.Mesh(
+        new THREE.BoxGeometry(3, 4, 0.1),
+        whiteMaterial
+      );
+      white.position.z = -1;
+      eye.add(white);
+      var pupil = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 2, 0.11),
+        blackMaterial
+      );
+      pupil.position.z = -1;
+      pupil.position.y = 0.5;
+      eye.add(pupil);
 
       playerBody.add(eye);
       eye.position.z = eyez;
@@ -77,38 +103,37 @@ var models = (function() {
     var roadDepth = 10;
     var roadWidth = 400; //20 spaces
     var roadHeight = 1;
-    //var roadBorderDepth = 1;
+    var roadBorderDepth = 1;
 
     var road = new THREE.Mesh(
       new THREE.BoxGeometry(roadWidth, roadHeight, roadDepth),
-      //new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('content/road.jpg') }), //http://opengameart.org/sites/default/files/oga-textures/tunnel_road.jpg
       new THREE.MeshLambertMaterial({
         color: 0x7b8396 //grey
-      }),
-      0
+      })
     );
+
+    var counter = 0;
+    var step = roadWidth/(2*20);
+    for (var i = -roadWidth/2; i < roadWidth/2; i+= step) {
+      if (counter % 2 === 0) {
+        var roadBorder = new THREE.Mesh(
+          new THREE.BoxGeometry(step, roadHeight, roadBorderDepth),
+          new THREE.MeshLambertMaterial({
+            color: 0xffffff
+          })
+        );
+        road.add(roadBorder);
+        roadBorder.receiveShadow = true;
+        roadBorder.position.x = i+step/2;
+        roadBorder.position.y = 0.1;
+        roadBorder.position.z = (roadDepth/2) + roadBorderDepth;
+      }
+      ++counter;
+    }
 
     road.name = 'road';
     road.receiveShadow = true;
     road.position.z = zPos;
-
-    // var counter = 0;
-    // var step = roadWidth/(2*20);
-    // for (var i = -roadWidth/2; i < roadWidth/2; i+= step) {
-    //   var color = counter % 2 === 0 ? 0x7b8396 : 0x525866;
-    //   var roadBorder = new THREE.Mesh(
-    //     new THREE.BoxGeometry(step, roadHeight, roadBorderDepth),
-    //     new THREE.MeshLambertMaterial({
-    //       color: color
-    //     }),
-    //     0 //static physijs
-    //   );
-    //   road.add(roadBorder);
-    //   roadBorder.receiveShadow = true;
-    //   roadBorder.position.x = i+step/2;
-    //   roadBorder.position.z = (-roadDepth + roadBorderDepth)/2;
-    //   ++counter;
-    // }
 
     return road;
   }
@@ -118,7 +143,6 @@ var models = (function() {
     //2 size buffer on both sides
     var river = new THREE.Mesh(
       new THREE.BoxGeometry(400, 1, 10),
-      //new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('content/water.jpg') }), //http://opengameart.org/node/10510
       new THREE.MeshPhongMaterial({
         color: 0x80f5ff,
         shininess: 2
@@ -131,21 +155,18 @@ var models = (function() {
   }
 
   function createGrass(zPos) {
-    // var grassTexture = THREE.ImageUtils.loadTexture('../content/grass.png'); //http://opengameart.org/sites/default/files/grass_0_0.png
-    // grassTexture.wrapS = grassTexture.wrapT = THREE.ClampToEdgeWrapping;
-    // grassTexture.repeat.set(1, 1);
-    // grassTexture.minFilter = THREE.LinearFilter;
-
-    // var material = new THREE.MeshLambertMaterial({ map: grassTexture });
+    var rowId = zPos / globals.blockSize;
+    var color = rowId % 2 === 0 ? 0xbef566 : 0xb3e85f;
     var grass = new THREE.Mesh(
-      new THREE.BoxGeometry(400, 1, 10),
-      /*material*/ new THREE.MeshLambertMaterial({ color: 0xbef566 })
+      new THREE.BoxGeometry(400, 2, 10),
+      new THREE.MeshLambertMaterial({ color: color })
     );
 
     grass.name = 'grass';
     grass.castShadow = false;
     grass.receiveShadow = true;
     grass.position.z = zPos;
+    grass.position.y = 1;
     return grass;
   }
 
@@ -181,18 +202,62 @@ var models = (function() {
 
   function createCar(width, origin, startPos, speed, zPos) {
     var colors = [ 0xfffe65, 0xff7035, 0x17EDFF, 0xBAF06C ];
-    var color = colors[support.getRandInt(0, colors.length)];
+    var secondaryColors = [ 0xe6e55b, 0xe66530, 0x15d5e6, 0xa7d861 ];
+    var randInt = support.getRandInt(0, colors.length);
+    var color = colors[randInt];
     var totalWidth = width*5 + 8;
     var car = new THREE.Mesh(
       new THREE.BoxGeometry(totalWidth, 6, 8),
       new THREE.MeshLambertMaterial({ color: color })
     );
+    var carCenter = new THREE.Mesh(
+      new THREE.BoxGeometry(totalWidth+0.1, 6+0.1, 5),
+      new THREE.MeshLambertMaterial({ color: secondaryColors[randInt] })
+    );
+    car.add(carCenter);
     car.castShadow = true;
+    var carBottom = new THREE.Mesh(
+      new THREE.BoxGeometry(totalWidth+0.11, 1, 8+0.11),
+      new THREE.MeshLambertMaterial({ color: 0xd8d5e0 })
+    );
+    carBottom.position.y = -2.5; //-3 + 0.5
+    car.add(carBottom);
 
+    var blackMaterial = new THREE.MeshPhongMaterial({
+      color: 0x000000
+    });
+    var hoodWidth = totalWidth*0.6;
+    var carMirror = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 10),
+      new THREE.MeshLambertMaterial({ color : color })
+    );
+    carMirror.position.y = 3 - 1; //1/2 height of body - 1/2 mirror height
+    carMirror.position.x = -hoodWidth*0.1;
+    car.add(carMirror);
     var hood = new THREE.Mesh(
-      new THREE.BoxGeometry(totalWidth*0.6, 4, 6),
+      new THREE.BoxGeometry(hoodWidth, 3, 7),
       new THREE.MeshLambertMaterial({ color: color })
     );
+    var hoodWindow = new THREE.Mesh(
+      new THREE.BoxGeometry(hoodWidth + 0.5, 2, 5),
+      blackMaterial
+    );
+    hoodWindow.position.y = -1;
+    hood.add(hoodWindow);
+    var hoodWindowSide1 = new THREE.Mesh(
+      new THREE.BoxGeometry(hoodWidth*0.5, 2, 7.2),
+      blackMaterial
+    );
+    hoodWindowSide1.position.y = -1;
+    hoodWindowSide1.position.x = -hoodWidth*0.1;
+    hood.add(hoodWindowSide1);
+    var hoodWindowSide2 = new THREE.Mesh(
+      new THREE.BoxGeometry(hoodWidth*0.1, 2, 7.2),
+      blackMaterial
+    );
+    hoodWindowSide2.position.y = -1;
+    hoodWindowSide2.position.x = hoodWidth*0.3;
+    hood.add(hoodWindowSide2);
     car.add(hood);
     hood.position.y = 5;
     hood.position.x = totalWidth*0.3/2;
@@ -200,7 +265,7 @@ var models = (function() {
     [-1, 1].forEach(function(pos) {
       var wheel = new THREE.Mesh(
         new THREE.CylinderGeometry(2, 2, 9),
-        new THREE.MeshLambertMaterial({color: 0x000000 })
+        blackMaterial
       );
       wheel.rotation.x = support.toRad(90);
       car.add(wheel);

@@ -72,7 +72,7 @@ var sceneSetup = (function () {
     for (i = 0; i < nRows; ++i) {
       switch (type) {
       case 0:
-        createGrass(currentRowId, 0.1);
+        createGrass(currentRowId, support.getRand(0.1, 0.3));
         break;
       case 1:
         createRoad(currentRowId);

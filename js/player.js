@@ -86,7 +86,7 @@ var player = (function() {
     if (animating === false) {
       return;
     }
-    var dprogress = 4*delta;
+    var dprogress = 3*delta;
     var step = dprogress * 10;
     progress += dprogress;
     switch (direction) {
