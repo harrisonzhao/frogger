@@ -14,8 +14,8 @@ var vehicle = (function() {
     //faster w/ more rows
     var speed = support.getRandInt(1, 4) + (-rowId/(-rowId+50))*2;
     var width = support.getRandInt(1, 4);
-    if (width === 4) {
-      width = 3.5;
+    if (width === 3) {
+      width = 2.5;
     }
     var origin = support.getRandInt(0, 2) === 0 ? 'left' : 'right';
     var zPos = rowId * globals.blockSize;
