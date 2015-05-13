@@ -58,6 +58,9 @@ var vehicle = (function() {
   }
 
   function update(delta) {
+    if (!game.playerActive()) {
+      return;
+    }
     //for each row, update row
     for (var key in vehicles) {
       if (vehicles.hasOwnProperty(key)) {

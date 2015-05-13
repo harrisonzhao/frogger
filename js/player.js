@@ -3,7 +3,8 @@
 
 var player = (function() {
 
-  var playerBox;
+  var playerBox = null;
+  var invisibleBox; //for the light to follow, the light must follow an object
   var direction = 0;
   var progress = 0;
   var animating = false;
@@ -32,12 +33,11 @@ var player = (function() {
     playerBox.rotation.y = support.toRad(rotation * 180);
     playerBox.position.y = getY(progress);
     playerBox.position.z += step;
+    invisibleBox.position.z = playerBox.position.z;
     game.camera.position.z += step;
-
-    game.light.position.z = playerBox.position.z - 50;
-    //game.light.position.y = game.light.position.z * -5;
-    //game.light.position.x = game.light.position.z;
-    game.light.target = playerBox;
+    game.light.position.z = playerBox.position.z + 
+                            globals.directionalLightBasePosition.z;
+    game.light.target = invisibleBox;
     game.light.updateMatrix();
     game.light.updateMatrixWorld();
   }
@@ -71,6 +71,11 @@ var player = (function() {
   }
 
   function createPlayer() {
+    invisibleBox = models.createInvisibleBox();
+    invisibleBox.position.x = 0;
+    invisibleBox.position.y = 0;
+    invisibleBox.position.z = 0;
+    game.scene.add(invisibleBox);
     playerBox = models.createPlayer();
     playerBox.position.x = 0;
     playerBox.position.z = 0;
@@ -98,12 +103,16 @@ var player = (function() {
       stepZ(-step);
       break;
     }
+
+    var rowNum = Math.round(-playerBox.position.z/globals.blockSize);
     if (progress >= 1) {
       animating = false;
       progress = 0;
-      playerBox.position.x = Math.round(playerBox.position.x/10)*10;
-      playerBox.position.z = Math.round(playerBox.position.z/10)*10;
+      playerBox.position.x = Math.round(playerBox.position.x/globals.blockSize)*
+                             globals.blockSize;
+      playerBox.position.z = -rowNum * globals.blockSize;
       playerBox.position.y = originalState.playerY;
+      invisibleBox.position.z = playerBox.position.z;
       game.camera.position.x = playerBox.position.x - 
                                originalState.playerX + 
                                originalState.cameraX;
@@ -111,6 +120,19 @@ var player = (function() {
                                originalState.playerZ + 
                                originalState.cameraZ;
     }
+
+    //update row number
+    rowNum = rowNum < 0 ? 0 : rowNum;
+    document.getElementById("rowNum").innerHTML = "Row: " + rowNum;
+
+    //edge case for when hit by car but jumped to next row
+    if (!game.playerActive()) {
+      flatten();
+    }
+  }
+
+  function flatten() {
+    playerBox.position.y = -5;
   }
 
   return {
@@ -120,7 +142,8 @@ var player = (function() {
     moveX: moveX,
     moveZ: moveZ,
     createPlayer: createPlayer,
-    update: update
+    update: update,
+    flatten: flatten
   };
 
 })();

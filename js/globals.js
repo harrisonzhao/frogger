@@ -5,5 +5,10 @@ var globals = {
   minCol: -20,
   maxCol: 20,
   lowerCol: -6,
-  upperCol: 5
+  upperCol: 5,
+  directionalLightBasePosition: {
+    x: -50,
+    y: 150,
+    z: -50
+  }
 };

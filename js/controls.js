@@ -1,7 +1,9 @@
 'use strict';
-/*globals player, globals, tree*/
+/*globals player, globals, tree, game*/
 
-var gameControls = (function(){
+var gameControls = (function() {
+
+  var respawn = false; //marker for first time init vs respawn
 
   function checkValidPosition(x, z) {
     if (tree.checkValidPosition(x, z) &&
@@ -13,10 +15,19 @@ var gameControls = (function(){
   }
 
   function checkKey(e) {
+    var blocker = document.getElementById('blocker');
+    if (blocker.style.display !== 'none') {
+      return;
+    }
+
     var left = 37;
     var up = 38;
     var right = 39;
     var down = 40;
+
+    if (!game.playerActive()) {
+      return;
+    }
 
     e = e || window.event;
 
@@ -34,13 +45,33 @@ var gameControls = (function(){
     }
   }
 
+  function setBlocker() {
+    var blocker = document.getElementById('blocker');
+    blocker.style.display = '';
+    var playerBox = player.playerBox();
+    var rowId = Math.round(-playerBox.position.z/10);
+    document.getElementById('message').innerHTML = 'You died!';
+    document.getElementById('score').innerHTML = 'Score: ' + rowId;
+    document.getElementById('click').innerHTML = 'Click to reload';
+  }
+
   function init() {
+    window.addEventListener("click", function(e) {
+      var blocker = document.getElementById('blocker');
+      blocker.style.display = 'none';
+      if (respawn) {
+        location.reload();
+      } else {
+        respawn = true;
+      }
+    });
     window.onkeydown = checkKey;
   }
 
   return {
     init: init,
-    checkValidPosition: checkValidPosition
-  }
+    checkValidPosition: checkValidPosition,
+    setBlocker: setBlocker
+  };
 
 })();

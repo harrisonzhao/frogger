@@ -3,12 +3,19 @@
 
 var models = (function() {
 
-  function createPlayer() {
-    var playerBoxMaterial = new THREE.MeshPhongMaterial({
+  function createInvisibleBox() {
+    var invisibleBoxMaterial = new THREE.MeshPhongMaterial({
       visible: false,
       transparent: true
     });
+    var box = new THREE.Mesh(
+      new THREE.BoxGeometry(10, 10, 10),
+      invisibleBoxMaterial
+    );
+    return box;
+  }
 
+  function createPlayer() {
     var personMaterial = new THREE.MeshPhongMaterial({
       color: 0x00dd00
     });
@@ -19,6 +26,7 @@ var models = (function() {
     );
 
     playerBody.position.y = -4;
+    playerBody.receiveShadow = true;
     playerBody.castShadow = true;
 
     var eyey = 2;
@@ -33,6 +41,7 @@ var models = (function() {
       eye.position.z = eyez;
       eye.position.y = eyey;
       eye.position.x = x;
+      eye.receiveShadow = true;
     });
 
     var legy = -3;
@@ -46,14 +55,12 @@ var models = (function() {
         leg.position.z = z;
         leg.position.y = legy;
         leg.position.x = x;
+        leg.receiveShadow = true;
         leg.castShadow = true;
       });
     });
 
-    var playerBox = new THREE.Mesh(
-      new THREE.BoxGeometry(10, 10, 10),
-      playerBoxMaterial
-    );
+    var playerBox = createInvisibleBox();
     playerBox.name = 'playerBox';
     playerBox.add(playerBody);
     playerBody.position.y = 5;
@@ -244,6 +251,7 @@ var models = (function() {
   }
 
   return {
+    createInvisibleBox: createInvisibleBox,
     createPlayer: createPlayer,
     createRoad: createRoad,
     createRiver: createRiver,
